@@ -19,7 +19,7 @@ Chaque ressource contient les informations suivantes :
 - **Tags / Mots-clés**  
 - **URL ou fichier**  
 
-Les données sont stockées dans **Omeka Classic**, puis enrichies par des **scripts Python** pour générer résumés, tags et suggestions interactives.
+Les données sont stockées dans **Omeka Classic**, puis enrichies par des **scripts Python** pour générer automatiquement les résumés, les tags et des conseils pratiques.
 
 ---
 

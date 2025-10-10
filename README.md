@@ -1,25 +1,20 @@
 # Projet Bien-Être AI
 
-## Description
-Bien-Être AI est un **portail numérique de ressources en santé mentale**.  
-Il permet aux utilisateurs de :  
+## Description du projet
+Notre projet consiste à développer un **portail numérique de ressources en santé mentale**.  
+Chaque ressource contient les informations suivantes, organisées dans Omeka :  
 
-- Consulter des ressources fiables sur le stress, le sommeil, la pleine conscience et d’autres outils de bien-être.  
-- Obtenir des **résumés et mots-clés générés automatiquement** par l’IA.  
-- Poser des questions à une **interface Q&R interactive** pour obtenir des conseils éducatifs.
+- **Titre**  
+- **Auteur / Source**  
+- **Date**  
+- **Description**  
+- **Type** (Article, Infographie, Audio, Checklist)  
+- **Catégorie** (Stress, Sommeil, Pleine conscience, Outils de gestion)  
+- **Tags / Mots-clés**  
+- **URL / Fichier**  
 
-Chaque ressource contient :  
-
-- Titre  
-- Auteur / Source  
-- Date  
-- Description courte  
-- Type (Article, Infographie, Audio, Checklist)  
-- Catégorie (Stress, Sommeil, Pleine conscience, Outils)  
-- Tags / Mots-clés  
-- URL ou fichier  
-
-Les données sont stockées dans **Omeka Classic** et enrichies via des **scripts Python** pour générer automatiquement les résumés, tags et conseils.
+L'utilisateur peut **consulter les ressources via le site Omeka** et **poser des questions à l’IA**.  
+Les données sont stockées dans **Omeka Classic** et enrichies via des **scripts Python** pour générer résumés et mots-clés.
 
 ---
 
@@ -43,4 +38,3 @@ erDiagram
         string email
     }
     RESSOURCE ||--o{ UTILISATEUR : "consulte"
-

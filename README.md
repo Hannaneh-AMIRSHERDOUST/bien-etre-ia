@@ -38,3 +38,5 @@ erDiagram
         string email
     }
     RESSOURCE ||--o{ UTILISATEUR : "consulte"
+```
+

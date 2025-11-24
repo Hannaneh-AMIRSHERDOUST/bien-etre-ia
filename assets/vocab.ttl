@@ -1,0 +1,62 @@
+@prefix beo: <https://example.org/bien-etre-ia#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+
+# ---- VOCABULAIRE BIEN-ÊTRE & IA ----
+
+beo:Exercise a rdfs:Class ;
+    rdfs:label "Exercice de bien-être" ;
+    rdfs:comment "Une activité ou pratique liée au bien-être (respiration, yoga, massage, affirmation...)." .
+
+beo:Emotion a rdfs:Class ;
+    rdfs:label "Émotion" ;
+    rdfs:comment "Une émotion ou état ressenti avant ou après un exercice." .
+
+beo:Goal a rdfs:Class ;
+    rdfs:label "Objectif" ;
+    rdfs:comment "Objectif bien-être (relaxation, glow up, confiance, focus)." .
+
+# ---- PROPRIÉTÉS ----
+
+beo:hasCategory a rdfs:Property ;
+    rdfs:label "Catégorie" ;
+    rdfs:comment "Type de pratique (Yoga, Respiration, Affirmation, Massage...)." ;
+    rdfs:domain beo:Exercise ;
+    rdfs:range rdfs:Literal .
+
+beo:duration a rdfs:Property ;
+    rdfs:label "Durée" ;
+    rdfs:comment "Durée en minutes." ;
+    rdfs:domain beo:Exercise ;
+    rdfs:range rdfs:Literal .
+
+beo:neededMaterial a rdfs:Property ;
+    rdfs:label "Matériel nécessaire" ;
+    rdfs:comment "Objets requis pour pratiquer l’exercice." ;
+    rdfs:domain beo:Exercise ;
+    rdfs:range rdfs:Literal .
+
+beo:recommendedFor a rdfs:Property ;
+    rdfs:label "Recommandé pour" ;
+    rdfs:comment "Objectif bien-être visé (relaxation, glow up…)." ;
+    rdfs:domain beo:Exercise ;
+    rdfs:range beo:Goal .
+
+beo:beforeEmotion a rdfs:Property ;
+    rdfs:label "Émotion avant" ;
+    rdfs:comment "Émotion ressentie avant l'exercice." ;
+    rdfs:domain beo:Exercise ;
+    rdfs:range beo:Emotion .
+
+beo:afterEmotion a rdfs:Property ;
+    rdfs:label "Émotion après" ;
+    rdfs:comment "Émotion ressentie après l'exercice." ;
+    rdfs:domain beo:Exercise ;
+    rdfs:range beo:Emotion .
+
+beo:mediaFile a rdfs:Property ;
+    rdfs:label "Fichier média" ;
+    rdfs:comment "Lien vers un fichier audio ou vidéo associé." ;
+    rdfs:domain beo:Exercise ;
+    rdfs:range rdfs:Literal .
+

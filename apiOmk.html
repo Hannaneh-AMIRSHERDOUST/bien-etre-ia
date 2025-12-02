@@ -3,435 +3,176 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bien-Être IA - Omeka API UI</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+    <title>Créer des exercices avec l'API OMK</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #f5f0e8 0%, #e8f5e9 100%);
             min-height: 100vh;
             padding: 20px;
         }
-
         header {
             background: white;
-            padding: 20px 40px;
+            padding: 20px;
             border-radius: 12px;
-            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
             margin-bottom: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
         }
-
         h1 {
             color: #4a7c59;
-            font-size: 28px;
         }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .card {
+        main {
             background: white;
             padding: 30px;
             border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            max-width: 800px;
+            margin: 0 auto;
         }
-
-        h2 {
-            color: #4a7c59;
-            margin-bottom: 20px;
-            font-size: 22px;
-        }
-
-        .row {
-            display: flex;
-            gap: 15px;
+        .form-group {
             margin-bottom: 15px;
         }
-
-        .col {
-            flex: 1;
-        }
-
         label {
             display: block;
             color: #5a5a5a;
             font-weight: 600;
-            margin-bottom: 8px;
-            font-size: 14px;
+            margin-bottom: 5px;
         }
-
-        input[type="text"],
-        input[type="number"],
-        textarea {
+        input {
             width: 100%;
-            padding: 10px 14px;
+            padding: 10px;
             border: 2px solid #e0e0e0;
             border-radius: 8px;
             font-size: 15px;
-            transition: all 0.2s;
-            font-family: inherit;
         }
-
-        input:focus, textarea:focus {
+        input:focus {
             outline: none;
             border-color: #81c784;
-            box-shadow: 0 0 0 3px rgba(129, 199, 132, 0.1);
         }
-
-        textarea {
-            resize: vertical;
-            min-height: 80px;
-        }
-
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 8px;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .btn-primary {
+        button {
             background: linear-gradient(135deg, #66bb6a 0%, #4a7c59 100%);
             color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
         }
-
-        .btn-primary:hover:not(:disabled) {
+        button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(74, 124, 89, 0.3);
+            box-shadow: 0 4px 12px rgba(74,124,89,0.3);
         }
-
-        .btn-ghost {
-            background: transparent;
-            border: 2px solid #e0e0e0;
-            color: #5a5a5a;
-        }
-
-        .btn-ghost:hover {
-            border-color: #4a7c59;
-            color: #4a7c59;
-        }
-
-        .btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none !important;
-        }
-
-        .table-wrap {
-            overflow-x: auto;
+        #listeExercices {
+            list-style: none;
             margin-top: 20px;
         }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        thead {
-            background: #f5f5f5;
-        }
-
-        th, td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #e0e0e0;
-        }
-
-        th {
-            color: #4a7c59;
-            font-weight: 600;
-        }
-
-        tbody tr:hover {
+        #listeExercices li {
             background: #f9f9f9;
-        }
-
-        .toast {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: #323232;
-            color: white;
-            padding: 16px 24px;
+            padding: 15px;
+            margin-bottom: 10px;
             border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-            opacity: 0;
-            transition: all 0.3s;
-            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
-
-        .hint {
-            color: #888;
-            font-size: 13px;
-            margin-top: 8px;
-            display: block;
-        }
-
-        .muted {
-            color: #888;
+        #resultCrea {
+            margin-top: 15px;
+            padding: 10px;
+            background: #e8f5e9;
+            border-radius: 8px;
+            color: #2e7d32;
             font-size: 14px;
+        }
+        footer {
+            text-align: center;
+            margin-top: 20px;
+            color: #888;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>🌿 Bien-Être IA — Omeka API UI</h1>
-            <div class="controls">
-                <button id="refreshAll" class="btn btn-ghost">Actualiser</button>
-            </div>
-        </header>
+    <header>
+        <h1>🌿 Créer des exercices avec l'API OMK</h1>
+    </header>
+    <main>
+        <div class="form-group">
+            <label>Titre de l'exercice</label>
+            <input type="text" id="titre" placeholder="Ex: Respiration profonde">
+        </div>
+        <div class="form-group">
+            <label>Catégorie</label>
+            <input type="text" id="categorie" placeholder="Ex: Respiration">
+        </div>
+        <div class="form-group">
+            <label>Durée (minutes)</label>
+            <input type="number" id="duree" placeholder="10">
+        </div>
+        <button onclick="creerExercice()">Créer l'exercice</button>
+        <div id="resultCrea"></div>
+        
+        <h2 style="margin-top: 30px; color: #4a7c59;">Liste des exercices</h2>
+        <ul id="listeExercices"></ul>
+    </main>
+    <footer>
+        <p>&copy; 2025 Bien-Être IA</p>
+    </footer>
 
-        <section class="card">
-            <h2>Créer un Exercice</h2>
+    <script type="module">
+        import {auth} from './modules/auth.js';
+        import {pa} from './modules/authParams.js';
 
-            <div class="row">
-                <div class="col">
-                    <label for="title">Titre *</label>
-                    <input type="text" id="title" placeholder="Ex: Respiration profonde">
-                </div>
-                <div class="col">
-                    <label for="category">Catégorie *</label>
-                    <input type="text" id="category" placeholder="Ex: Respiration">
-                </div>
-            </div>
+        let a = new auth(pa);
+        
+        // Vérifier l'utilisateur connecté
+        a.getUser(u => {
+            console.log("Utilisateur connecté :", u);
+        });
 
-            <div class="row">
-                <div class="col">
-                    <label for="duration">Durée (minutes) *</label>
-                    <input type="number" id="duration" placeholder="10" min="1">
-                </div>
-                <div class="col">
-                    <label for="material">Matériel nécessaire</label>
-                    <input type="text" id="material" placeholder="Ex: Tapis de yoga">
-                </div>
-            </div>
+        // Charger la liste des exercices (Resource Template ID 8)
+        let url = "http://localhost/omk_thyp_25-26_clone/api/items?resource_template_id=8";
+        d3.json(url).then(data => {
+            let eLi = d3.select('#listeExercices').selectAll('li')
+                .data(data).enter().append('li')
+                .text(d => d['o:title'] || d['dcterms:title']?.[0]?.['@value'] || 'Sans titre');
+        });
 
-            <div class="row">
-                <div class="col">
-                    <label for="beforeEmotion">Émotion avant</label>
-                    <input type="text" id="beforeEmotion" placeholder="Ex: Stress">
-                </div>
-                <div class="col">
-                    <label for="afterEmotion">Émotion après</label>
-                    <input type="text" id="afterEmotion" placeholder="Ex: Calme">
-                </div>
-            </div>
+        // Fonction globale pour créer un exercice
+        window.creerExercice = function() {
+            let titre = document.getElementById('titre').value;
+            let categorie = document.getElementById('categorie').value;
+            let duree = document.getElementById('duree').value;
 
-            <div class="row">
-                <div class="col">
-                    <label for="recommendedFor">Recommandé pour</label>
-                    <input type="text" id="recommendedFor" placeholder="Ex: Réduction du stress">
-                </div>
-            </div>
+            if (!titre || !categorie || !duree) {
+                alert('Remplissez tous les champs');
+                return;
+            }
 
-            <div style="display:flex;gap:10px;align-items:center;margin-top:15px">
-                <button id="btnCreateExercise" class="btn btn-primary">Créer l'exercice</button>
-                <button id="btnClear" class="btn btn-ghost">Effacer</button>
-            </div>
+            let data = {};
+            data['o:resource_template'] = 8;
+            data['dcterms:title'] = titre;
+            data['beo:hasCategory'] = categorie;
+            data['beo:duration'] = duree + ' minutes';
 
-            <div class="table-wrap">
-                <table>
-                    <thead>
-                        <tr>
-                            <th style="width:70px">ID</th>
-                            <th>Titre</th>
-                            <th>Catégorie</th>
-                            <th>Durée</th>
-                            <th style="width:100px">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="exerciseList"></tbody>
-                </table>
-            </div>
-
-            <small class="hint">Les exercices créés apparaissent instantanément dans le tableau.</small>
-        </section>
-    </div>
-
-    <script>
-        const BASE_URL = 'http://localhost/omk_thyp_25-26_clone';
-        const KEY_IDENTITY = '9x53ZNIuZMJofzCo54y7yRUVHbx1bnUw';
-        const KEY_CREDENTIAL = 'Pnf97t9lJ28ypl8DC575a0pw8ayhjPef';
-        const RESOURCE_TEMPLATE_ID = 8;
-
-        function showMessage(text, time = 3000) {
-            const toast = document.createElement('div');
-            toast.className = 'toast';
-            toast.textContent = text;
-            document.body.appendChild(toast);
-            setTimeout(() => toast.style.opacity = '0.95', 10);
-            setTimeout(() => {
-                toast.style.transition = 'all .25s ease';
-                toast.style.opacity = '0';
-                toast.style.transform = 'translateY(6px)';
-            }, time - 250);
-            setTimeout(() => toast.remove(), time);
-        }
-
-        async function fillExercisesTable() {
-            try {
-                const resp = await fetch(`${BASE_URL}/api/items?resource_template_id=${RESOURCE_TEMPLATE_ID}&key_identity=${KEY_IDENTITY}&key_credential=${KEY_CREDENTIAL}`);
-                const data = await resp.json();
+            a.createItem(data, i => {
+                d3.select('#resultCrea').text('✓ Exercice créé : ' + JSON.stringify(i['o:title']));
                 
-                const tbody = d3.select("#exerciseList");
-                tbody.selectAll("tr").remove();
+                // Ajouter à la liste
+                d3.select('#listeExercices').append('li')
+                    .text(titre);
                 
-                data.forEach(item => {
-                    const row = tbody.append("tr");
-                    row.append("td").text(item['o:id']);
-                    
-                    const title = item['dcterms:title'] ? item['dcterms:title'][0]['@value'] : 'Sans titre';
-                    row.append("td").text(title);
-                    
-                    const category = item['beo:hasCategory'] ? item['beo:hasCategory'][0]['@value'] : '-';
-                    row.append("td").text(category);
-                    
-                    const duration = item['beo:duration'] ? item['beo:duration'][0]['@value'] : '-';
-                    row.append("td").text(duration);
-                    
-                    row.append("td").html(`<button class="btn btn-ghost btnDelete" data-id="${item['o:id']}" style="padding:6px 12px;font-size:13px">Supprimer</button>`);
-                });
-            } catch (error) {
-                console.error("Erreur chargement:", error);
-                showMessage('Erreur de chargement des exercices');
-            }
+                // Réinitialiser le formulaire
+                document.getElementById('titre').value = '';
+                document.getElementById('categorie').value = '';
+                document.getElementById('duree').value = '';
+            });
         }
-
-        async function createExercise() {
-            const btn = document.getElementById('btnCreateExercise');
-            const title = d3.select("#title").property("value").trim();
-            const category = d3.select("#category").property("value").trim();
-            const duration = d3.select("#duration").property("value").trim();
-            
-            if (!title || !category || !duration) {
-                return showMessage('Remplissez les champs obligatoires');
-            }
-
-            btn.disabled = true;
-            btn.textContent = 'Création...';
-
-            const payload = {
-                'o:resource_template': { 'o:id': RESOURCE_TEMPLATE_ID },
-                'dcterms:title': [{ '@value': title }],
-                'beo:hasCategory': [{ '@value': category }],
-                'beo:duration': [{ '@value': duration + ' minutes' }]
-            };
-
-            const material = d3.select("#material").property("value").trim();
-            if (material) payload['beo:neededMaterial'] = [{ '@value': material }];
-
-            const beforeEmotion = d3.select("#beforeEmotion").property("value").trim();
-            if (beforeEmotion) payload['beo:beforeEmotion'] = [{ '@value': beforeEmotion }];
-
-            const afterEmotion = d3.select("#afterEmotion").property("value").trim();
-            if (afterEmotion) payload['beo:afterEmotion'] = [{ '@value': afterEmotion }];
-
-            const recommendedFor = d3.select("#recommendedFor").property("value").trim();
-            if (recommendedFor) payload['beo:recommendedFor'] = [{ '@value': recommendedFor }];
-
-            try {
-                const response = await fetch(`${BASE_URL}/api/items?key_identity=${KEY_IDENTITY}&key_credential=${KEY_CREDENTIAL}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                const item = await response.json();
-
-                if (response.ok) {
-                    // Quick UI update
-                    const tbody = d3.select("#exerciseList");
-                    const row = tbody.append("tr");
-                    row.append("td").text(item['o:id']);
-                    row.append("td").text(title);
-                    row.append("td").text(category);
-                    row.append("td").text(duration + ' minutes');
-                    row.append("td").html(`<button class="btn btn-ghost btnDelete" data-id="${item['o:id']}" style="padding:6px 12px;font-size:13px">Supprimer</button>`);
-
-                    // Clear form
-                    d3.select("#title").property("value", "");
-                    d3.select("#category").property("value", "");
-                    d3.select("#duration").property("value", "");
-                    d3.select("#material").property("value", "");
-                    d3.select("#beforeEmotion").property("value", "");
-                    d3.select("#afterEmotion").property("value", "");
-                    d3.select("#recommendedFor").property("value", "");
-
-                    showMessage('✓ Exercice créé avec succès!');
-                } else {
-                    console.error('Erreur:', item);
-                    showMessage('✗ Erreur: ' + (item.error || JSON.stringify(item.errors)));
-                }
-            } catch (err) {
-                console.error(err);
-                showMessage('✗ Erreur de connexion');
-            } finally {
-                btn.disabled = false;
-                btn.textContent = 'Créer l\'exercice';
-            }
-        }
-
-        async function deleteExercise(itemId) {
-            try {
-                const response = await fetch(`${BASE_URL}/api/items/${itemId}?key_identity=${KEY_IDENTITY}&key_credential=${KEY_CREDENTIAL}`, {
-                    method: 'DELETE'
-                });
-
-                if (response.ok || response.status === 204) {
-                    showMessage('✓ Exercice supprimé');
-                    d3.select(`button[data-id="${itemId}"]`).node()?.closest('tr')?.remove();
-                } else {
-                    throw new Error('Erreur: ' + response.status);
-                }
-            } catch (e) {
-                console.error(e);
-                showMessage('Suppression effectuée');
-                fillExercisesTable();
-            }
-        }
-
-        // Event listeners
-        d3.select("#btnCreateExercise").on("click", createExercise);
-        d3.select("#btnClear").on("click", () => {
-            d3.select("#title").property("value", "");
-            d3.select("#category").property("value", "");
-            d3.select("#duration").property("value", "");
-            d3.select("#material").property("value", "");
-            d3.select("#beforeEmotion").property("value", "");
-            d3.select("#afterEmotion").property("value", "");
-            d3.select("#recommendedFor").property("value", "");
-        });
-        d3.select("#refreshAll").on("click", () => {
-            fillExercisesTable();
-            showMessage('Actualisé');
-        });
-
-        // Delegate delete clicks
-        d3.select("body").on("click", function(event) {
-            if (event.target.classList && event.target.classList.contains("btnDelete")) {
-                const itemId = event.target.getAttribute("data-id");
-                deleteExercise(itemId);
-            }
-        });
-
-        // Initial load
-        fillExercisesTable();
     </script>
 </body>
 </html>

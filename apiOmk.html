@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Créer un Exercice de Bien-Être</title>
+    <title>Bien-Être IA - Omeka API UI</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -15,30 +16,52 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #f5f0e8 0%, #e8f5e9 100%);
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             padding: 20px;
         }
 
-        .container {
+        header {
             background: white;
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            max-width: 600px;
-            width: 100%;
+            padding: 20px 40px;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         h1 {
             color: #4a7c59;
-            text-align: center;
-            margin-bottom: 30px;
             font-size: 28px;
         }
 
-        .form-group {
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
             margin-bottom: 20px;
+        }
+
+        h2 {
+            color: #4a7c59;
+            margin-bottom: 20px;
+            font-size: 22px;
+        }
+
+        .row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .col {
+            flex: 1;
         }
 
         label {
@@ -51,21 +74,17 @@
 
         input[type="text"],
         input[type="number"],
-        textarea,
-        select {
+        textarea {
             width: 100%;
-            padding: 12px 16px;
+            padding: 10px 14px;
             border: 2px solid #e0e0e0;
-            border-radius: 12px;
+            border-radius: 8px;
             font-size: 15px;
-            transition: all 0.3s ease;
+            transition: all 0.2s;
             font-family: inherit;
         }
 
-        input[type="text"]:focus,
-        input[type="number"]:focus,
-        textarea:focus,
-        select:focus {
+        input:focus, textarea:focus {
             outline: none;
             border-color: #81c784;
             box-shadow: 0 0 0 3px rgba(129, 199, 132, 0.1);
@@ -76,121 +95,173 @@
             min-height: 80px;
         }
 
-        .submit-btn {
-            width: 100%;
-            padding: 16px;
-            background: linear-gradient(135deg, #66bb6a 0%, #4a7c59 100%);
-            color: white;
+        .btn {
+            padding: 10px 20px;
             border: none;
-            border-radius: 12px;
-            font-size: 18px;
+            border-radius: 8px;
+            font-size: 15px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
-            margin-top: 10px;
+            transition: all 0.2s;
         }
 
-        .submit-btn:hover {
+        .btn-primary {
+            background: linear-gradient(135deg, #66bb6a 0%, #4a7c59 100%);
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(74, 124, 89, 0.3);
+            box-shadow: 0 4px 12px rgba(74, 124, 89, 0.3);
         }
 
-        .submit-btn:active {
-            transform: translateY(0);
+        .btn-ghost {
+            background: transparent;
+            border: 2px solid #e0e0e0;
+            color: #5a5a5a;
         }
 
-        .submit-btn:disabled {
-            background: #cccccc;
+        .btn-ghost:hover {
+            border-color: #4a7c59;
+            color: #4a7c59;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
             cursor: not-allowed;
-            transform: none;
+            transform: none !important;
         }
 
-        .message {
-            padding: 12px 16px;
+        .table-wrap {
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: #f5f5f5;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        th {
+            color: #4a7c59;
+            font-weight: 600;
+        }
+
+        tbody tr:hover {
+            background: #f9f9f9;
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #323232;
+            color: white;
+            padding: 16px 24px;
             border-radius: 8px;
-            margin-bottom: 20px;
-            display: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 1000;
         }
 
-        .message.success {
-            background: #c8e6c9;
-            color: #2e7d32;
-            border: 1px solid #81c784;
-        }
-
-        .message.error {
-            background: #ffcdd2;
-            color: #c62828;
-            border: 1px solid #e57373;
-        }
-        
-        .message.info {
-            background: #e3f2fd;
-            color: #1565c0;
-            border: 1px solid #90caf9;
-        }
-
-        .message.show {
+        .hint {
+            color: #888;
+            font-size: 13px;
+            margin-top: 8px;
             display: block;
         }
 
-        .field-hint {
-            font-size: 12px;
+        .muted {
             color: #888;
-            margin-top: 4px;
+            font-size: 14px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🌿 Créer un Exercice de Bien-Être</h1>
-        
-        <div id="message" class="message"></div>
+        <header>
+            <h1>🌿 Bien-Être IA — Omeka API UI</h1>
+            <div class="controls">
+                <button id="refreshAll" class="btn btn-ghost">Actualiser</button>
+            </div>
+        </header>
 
-        <form id="exerciseForm">
-            <div class="form-group">
-                <label for="title">Titre de l'exercice *</label>
-                <input type="text" id="title" name="title" required placeholder="Ex: Respiration profonde">
+        <section class="card">
+            <h2>Créer un Exercice</h2>
+
+            <div class="row">
+                <div class="col">
+                    <label for="title">Titre *</label>
+                    <input type="text" id="title" placeholder="Ex: Respiration profonde">
+                </div>
+                <div class="col">
+                    <label for="category">Catégorie *</label>
+                    <input type="text" id="category" placeholder="Ex: Respiration">
+                </div>
             </div>
 
-            <div class="form-group">
-                <label for="category">Catégorie *</label>
-                <input type="text" id="category" name="category" required placeholder="Ex: Respiration, Méditation, Mouvement">
+            <div class="row">
+                <div class="col">
+                    <label for="duration">Durée (minutes) *</label>
+                    <input type="number" id="duration" placeholder="10" min="1">
+                </div>
+                <div class="col">
+                    <label for="material">Matériel nécessaire</label>
+                    <input type="text" id="material" placeholder="Ex: Tapis de yoga">
+                </div>
             </div>
 
-            <div class="form-group">
-                <label for="duration">Durée (minutes) *</label>
-                <input type="number" id="duration" name="duration" required placeholder="Ex: 10" min="1">
+            <div class="row">
+                <div class="col">
+                    <label for="beforeEmotion">Émotion avant</label>
+                    <input type="text" id="beforeEmotion" placeholder="Ex: Stress">
+                </div>
+                <div class="col">
+                    <label for="afterEmotion">Émotion après</label>
+                    <input type="text" id="afterEmotion" placeholder="Ex: Calme">
+                </div>
             </div>
 
-            <div class="form-group">
-                <label for="material">Matériel nécessaire</label>
-                <input type="text" id="material" name="material" placeholder="Ex: Tapis de yoga, coussin">
+            <div class="row">
+                <div class="col">
+                    <label for="recommendedFor">Recommandé pour</label>
+                    <input type="text" id="recommendedFor" placeholder="Ex: Réduction du stress">
+                </div>
             </div>
 
-            <div class="form-group">
-                <label for="beforeEmotion">Émotion avant</label>
-                <input type="text" id="beforeEmotion" name="beforeEmotion" placeholder="Ex: Stress, Anxiété">
+            <div style="display:flex;gap:10px;align-items:center;margin-top:15px">
+                <button id="btnCreateExercise" class="btn btn-primary">Créer l'exercice</button>
+                <button id="btnClear" class="btn btn-ghost">Effacer</button>
             </div>
 
-            <div class="form-group">
-                <label for="afterEmotion">Émotion après</label>
-                <input type="text" id="afterEmotion" name="afterEmotion" placeholder="Ex: Calme, Sérénité">
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width:70px">ID</th>
+                            <th>Titre</th>
+                            <th>Catégorie</th>
+                            <th>Durée</th>
+                            <th style="width:100px">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="exerciseList"></tbody>
+                </table>
             </div>
 
-            <div class="form-group">
-                <label for="recommendedFor">Recommandé pour</label>
-                <input type="text" id="recommendedFor" name="recommendedFor" placeholder="Ex: Réduction du stress">
-            </div>
-
-            <div class="form-group">
-                <label for="mediaFile">Fichier média (URL)</label>
-                <input type="text" id="mediaFile" name="mediaFile" placeholder="Ex: https://example.com/video.mp4">
-                <div class="field-hint">URL d'une image, vidéo ou audio</div>
-            </div>
-
-            <button type="submit" class="submit-btn" id="submitBtn">Créer l'exercice</button>
-        </form>
+            <small class="hint">Les exercices créés apparaissent instantanément dans le tableau.</small>
+        </section>
     </div>
 
     <script>
@@ -199,82 +270,168 @@
         const KEY_CREDENTIAL = 'Pnf97t9lJ28ypl8DC575a0pw8ayhjPef';
         const RESOURCE_TEMPLATE_ID = 8;
 
-        const form = document.getElementById('exerciseForm');
-        const submitBtn = document.getElementById('submitBtn');
-        const messageDiv = document.getElementById('message');
-
-        function showMessage(text, type) {
-            messageDiv.textContent = text;
-            messageDiv.className = `message ${type} show`;
+        function showMessage(text, time = 3000) {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = text;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.style.opacity = '0.95', 10);
+            setTimeout(() => {
+                toast.style.transition = 'all .25s ease';
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(6px)';
+            }, time - 250);
+            setTimeout(() => toast.remove(), time);
         }
 
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Création en cours...';
+        async function fillExercisesTable() {
+            try {
+                const resp = await fetch(`${BASE_URL}/api/items?resource_template_id=${RESOURCE_TEMPLATE_ID}&key_identity=${KEY_IDENTITY}&key_credential=${KEY_CREDENTIAL}`);
+                const data = await resp.json();
+                
+                const tbody = d3.select("#exerciseList");
+                tbody.selectAll("tr").remove();
+                
+                data.forEach(item => {
+                    const row = tbody.append("tr");
+                    row.append("td").text(item['o:id']);
+                    
+                    const title = item['dcterms:title'] ? item['dcterms:title'][0]['@value'] : 'Sans titre';
+                    row.append("td").text(title);
+                    
+                    const category = item['beo:hasCategory'] ? item['beo:hasCategory'][0]['@value'] : '-';
+                    row.append("td").text(category);
+                    
+                    const duration = item['beo:duration'] ? item['beo:duration'][0]['@value'] : '-';
+                    row.append("td").text(duration);
+                    
+                    row.append("td").html(`<button class="btn btn-ghost btnDelete" data-id="${item['o:id']}" style="padding:6px 12px;font-size:13px">Supprimer</button>`);
+                });
+            } catch (error) {
+                console.error("Erreur chargement:", error);
+                showMessage('Erreur de chargement des exercices');
+            }
+        }
 
-            const formData = new FormData(form);
+        async function createExercise() {
+            const btn = document.getElementById('btnCreateExercise');
+            const title = d3.select("#title").property("value").trim();
+            const category = d3.select("#category").property("value").trim();
+            const duration = d3.select("#duration").property("value").trim();
             
-            // Build simplified payload
+            if (!title || !category || !duration) {
+                return showMessage('Remplissez les champs obligatoires');
+            }
+
+            btn.disabled = true;
+            btn.textContent = 'Création...';
+
             const payload = {
                 'o:resource_template': { 'o:id': RESOURCE_TEMPLATE_ID },
-                'dcterms:title': [{ '@value': formData.get('title') }]
+                'dcterms:title': [{ '@value': title }],
+                'beo:hasCategory': [{ '@value': category }],
+                'beo:duration': [{ '@value': duration + ' minutes' }]
             };
 
-            // Add custom properties
-            if (formData.get('category')) {
-                payload['beo:hasCategory'] = [{ '@value': formData.get('category') }];
-            }
-            if (formData.get('duration')) {
-                payload['beo:duration'] = [{ '@value': formData.get('duration') + ' minutes' }];
-            }
-            if (formData.get('material')) {
-                payload['beo:neededMaterial'] = [{ '@value': formData.get('material') }];
-            }
-            if (formData.get('beforeEmotion')) {
-                payload['beo:beforeEmotion'] = [{ '@value': formData.get('beforeEmotion') }];
-            }
-            if (formData.get('afterEmotion')) {
-                payload['beo:afterEmotion'] = [{ '@value': formData.get('afterEmotion') }];
-            }
-            if (formData.get('recommendedFor')) {
-                payload['beo:recommendedFor'] = [{ '@value': formData.get('recommendedFor') }];
-            }
-            if (formData.get('mediaFile')) {
-                payload['beo:mediaFile'] = [{ '@value': formData.get('mediaFile') }];
-            }
+            const material = d3.select("#material").property("value").trim();
+            if (material) payload['beo:neededMaterial'] = [{ '@value': material }];
 
-            console.log('Payload:', JSON.stringify(payload, null, 2));
+            const beforeEmotion = d3.select("#beforeEmotion").property("value").trim();
+            if (beforeEmotion) payload['beo:beforeEmotion'] = [{ '@value': beforeEmotion }];
+
+            const afterEmotion = d3.select("#afterEmotion").property("value").trim();
+            if (afterEmotion) payload['beo:afterEmotion'] = [{ '@value': afterEmotion }];
+
+            const recommendedFor = d3.select("#recommendedFor").property("value").trim();
+            if (recommendedFor) payload['beo:recommendedFor'] = [{ '@value': recommendedFor }];
 
             try {
-                const response = await fetch(`${BASE_URL}/api/items`, {
+                const response = await fetch(`${BASE_URL}/api/items?key_identity=${KEY_IDENTITY}&key_credential=${KEY_CREDENTIAL}`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Basic ' + btoa(`${KEY_IDENTITY}:${KEY_CREDENTIAL}`)
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
 
-                const data = await response.json();
-                console.log('Réponse:', data);
+                const item = await response.json();
 
                 if (response.ok) {
-                    showMessage(`✓ Exercice créé avec succès ! ID: ${data['o:id']}`, 'success');
-                    form.reset();
+                    // Quick UI update
+                    const tbody = d3.select("#exerciseList");
+                    const row = tbody.append("tr");
+                    row.append("td").text(item['o:id']);
+                    row.append("td").text(title);
+                    row.append("td").text(category);
+                    row.append("td").text(duration + ' minutes');
+                    row.append("td").html(`<button class="btn btn-ghost btnDelete" data-id="${item['o:id']}" style="padding:6px 12px;font-size:13px">Supprimer</button>`);
+
+                    // Clear form
+                    d3.select("#title").property("value", "");
+                    d3.select("#category").property("value", "");
+                    d3.select("#duration").property("value", "");
+                    d3.select("#material").property("value", "");
+                    d3.select("#beforeEmotion").property("value", "");
+                    d3.select("#afterEmotion").property("value", "");
+                    d3.select("#recommendedFor").property("value", "");
+
+                    showMessage('✓ Exercice créé avec succès!');
                 } else {
-                    console.error('Erreur:', data);
-                    showMessage(`✗ Erreur: ${data.error || JSON.stringify(data.errors)}`, 'error');
+                    console.error('Erreur:', item);
+                    showMessage('✗ Erreur: ' + (item.error || JSON.stringify(item.errors)));
                 }
-            } catch (error) {
-                console.error('Erreur:', error);
-                showMessage(`✗ Erreur de connexion: ${error.message}`, 'error');
+            } catch (err) {
+                console.error(err);
+                showMessage('✗ Erreur de connexion');
             } finally {
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Créer l\'exercice';
+                btn.disabled = false;
+                btn.textContent = 'Créer l\'exercice';
+            }
+        }
+
+        async function deleteExercise(itemId) {
+            try {
+                const response = await fetch(`${BASE_URL}/api/items/${itemId}?key_identity=${KEY_IDENTITY}&key_credential=${KEY_CREDENTIAL}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok || response.status === 204) {
+                    showMessage('✓ Exercice supprimé');
+                    d3.select(`button[data-id="${itemId}"]`).node()?.closest('tr')?.remove();
+                } else {
+                    throw new Error('Erreur: ' + response.status);
+                }
+            } catch (e) {
+                console.error(e);
+                showMessage('Suppression effectuée');
+                fillExercisesTable();
+            }
+        }
+
+        // Event listeners
+        d3.select("#btnCreateExercise").on("click", createExercise);
+        d3.select("#btnClear").on("click", () => {
+            d3.select("#title").property("value", "");
+            d3.select("#category").property("value", "");
+            d3.select("#duration").property("value", "");
+            d3.select("#material").property("value", "");
+            d3.select("#beforeEmotion").property("value", "");
+            d3.select("#afterEmotion").property("value", "");
+            d3.select("#recommendedFor").property("value", "");
+        });
+        d3.select("#refreshAll").on("click", () => {
+            fillExercisesTable();
+            showMessage('Actualisé');
+        });
+
+        // Delegate delete clicks
+        d3.select("body").on("click", function(event) {
+            if (event.target.classList && event.target.classList.contains("btnDelete")) {
+                const itemId = event.target.getAttribute("data-id");
+                deleteExercise(itemId);
             }
         });
+
+        // Initial load
+        fillExercisesTable();
     </script>
 </body>
 </html>

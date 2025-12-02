@@ -37,4 +37,13 @@ return [
             __DIR__ . '/../view',
         ],
     ],
+    'navigation' => [
+        'site' => [
+            [
+                'label' => 'Chatbot Bien-Être',
+                'route' => 'bien-etre-bot',
+                'visible' => true,
+            ],
+        ],
+    ],
 ];

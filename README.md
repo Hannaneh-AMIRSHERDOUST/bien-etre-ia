@@ -1,12 +1,12 @@
-# Bien-Être IA
+# Bien-ï¿½tre IA
 
-Projet de gestion d'exercices de bien-être avec Omeka S et intégration IA.
+Projet de gestion d'exercices de bien-ï¿½tre avec Omeka S et intï¿½gration IA.
 
 ## Contenu
 
-- **Vocabulaire personnalisé** : `assets/vocab.ttl` (namespace beo:)
-- **Données** : `assets/exercises.csv` (exemples d'exercices)
-- **Interface API** : `apiOmk.html` (création et gestion d'exercices)
+- **Vocabulaire personnalisï¿½** : `assets/vocab.ttl` (namespace beo:)
+- **Donnï¿½es** : `assets/exercises.csv` (exemples d'exercices)
+- **Interface API** : `apiOmk.html` (crï¿½ation et gestion d'exercices)
 - **Import CSV** : `bulk-import.html` (import en masse)
 - **Module Omeka S** : `modules/BienEtreBot/` (chatbot avec IA)
 
@@ -14,7 +14,7 @@ Projet de gestion d'exercices de bien-être avec Omeka S et intégration IA.
 
 1. Copier le module dans votre installation Omeka S
 2. Activer le module dans l'administration Omeka S
-3. Accéder au chatbot : `/bien-etre-bot`
+3. AccÃ©der au chatbot : http://localhost/omk_thyp_25-26_clone/bien-etre-bot
 
 ## Technologies
 

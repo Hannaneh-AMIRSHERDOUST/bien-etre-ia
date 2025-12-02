@@ -1,0 +1,99 @@
+<?php
+$this->headTitle('Créer un Exercice');
+?>
+
+<h1>🌿 Créer un Exercice de Bien-Être</h1>
+
+<?php echo $this->messages(); ?>
+
+<form method="post" style="max-width: 600px;">
+    
+    <div class="field">
+        <div class="field-meta">
+            <label for="title">Titre de l'exercice *</label>
+        </div>
+        <div class="inputs">
+            <input type="text" id="title" name="title" required placeholder="Ex: Respiration profonde">
+        </div>
+    </div>
+    
+    <div class="field">
+        <div class="field-meta">
+            <label for="category">Catégorie *</label>
+        </div>
+        <div class="inputs">
+            <input type="text" id="category" name="category" required placeholder="Ex: Respiration, Méditation">
+        </div>
+    </div>
+    
+    <div class="field">
+        <div class="field-meta">
+            <label for="duration">Durée (minutes) *</label>
+        </div>
+        <div class="inputs">
+            <input type="number" id="duration" name="duration" required placeholder="Ex: 10" min="1">
+        </div>
+    </div>
+    
+    <div class="field">
+        <div class="field-meta">
+            <label for="material">Matériel nécessaire</label>
+        </div>
+        <div class="inputs">
+            <input type="text" id="material" name="material" placeholder="Ex: Tapis de yoga">
+        </div>
+    </div>
+    
+    <div class="field">
+        <div class="field-meta">
+            <label for="beforeEmotion">Émotion avant</label>
+        </div>
+        <div class="inputs">
+            <input type="text" id="beforeEmotion" name="beforeEmotion" placeholder="Ex: Stress, Anxiété">
+        </div>
+    </div>
+    
+    <div class="field">
+        <div class="field-meta">
+            <label for="afterEmotion">Émotion après</label>
+        </div>
+        <div class="inputs">
+            <input type="text" id="afterEmotion" name="afterEmotion" placeholder="Ex: Calme, Sérénité">
+        </div>
+    </div>
+    
+    <div class="field">
+        <div class="field-meta">
+            <label for="recommendedFor">Recommandé pour</label>
+        </div>
+        <div class="inputs">
+            <input type="text" id="recommendedFor" name="recommendedFor" placeholder="Ex: Réduction du stress">
+        </div>
+    </div>
+    
+    <div class="field">
+        <div class="field-meta">
+            <label for="mediaFile">Fichier média (URL)</label>
+        </div>
+        <div class="inputs">
+            <input type="text" id="mediaFile" name="mediaFile" placeholder="Ex: https://example.com/video.mp4">
+        </div>
+    </div>
+    
+    <div class="field">
+        <button type="submit" class="button" style="background: #66bb6a; color: white; padding: 12px 24px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
+            Créer l'exercice
+        </button>
+        <a href="<?php echo $this->url('bien-etre'); ?>" class="button" style="background: #999; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: 600; margin-left: 10px;">
+            Annuler
+        </a>
+    </div>
+    
+</form>
+
+<style>
+.field { margin-bottom: 20px; }
+.field-meta label { font-weight: 600; display: block; margin-bottom: 5px; }
+.inputs input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; }
+.button:hover { opacity: 0.9; }
+</style>

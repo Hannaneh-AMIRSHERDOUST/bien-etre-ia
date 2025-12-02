@@ -1,0 +1,27 @@
+<?php
+$this->headTitle('Exercices de Bien-Être');
+?>
+
+<h1>🌿 Exercices de Bien-Être</h1>
+
+<?php echo $this->messages(); ?>
+
+<div class="section">
+    <a href="<?php echo $this->url('bien-etre/create'); ?>" class="button">Créer un nouvel exercice</a>
+</div>
+
+<style>
+.section { margin: 20px 0; }
+.button {
+    display: inline-block;
+    padding: 12px 24px;
+    background: #66bb6a;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 600;
+}
+.button:hover {
+    background: #4a7c59;
+}
+</style>

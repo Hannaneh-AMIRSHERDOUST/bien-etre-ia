@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Créer un Exercice de Bien-Être</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f0e8 0%, #e8f5e9 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #4a7c59;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            color: #5a5a5a;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: #81c784;
+            box-shadow: 0 0 0 3px rgba(129, 199, 132, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #66bb6a 0%, #4a7c59 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(74, 124, 89, 0.3);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .submit-btn:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .message {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .message.success {
+            background: #c8e6c9;
+            color: #2e7d32;
+            border: 1px solid #81c784;
+        }
+
+        .message.error {
+            background: #ffcdd2;
+            color: #c62828;
+            border: 1px solid #e57373;
+        }
+        
+        .message.info {
+            background: #e3f2fd;
+            color: #1565c0;
+            border: 1px solid #90caf9;
+        }
+
+        .message.show {
+            display: block;
+        }
+
+        .field-hint {
+            font-size: 12px;
+            color: #888;
+            margin-top: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌿 Créer un Exercice de Bien-Être</h1>
+        
+        <div id="message" class="message"></div>
+
+        <form id="exerciseForm">
+            <div class="form-group">
+                <label for="title">Titre de l'exercice *</label>
+                <input type="text" id="title" name="title" required placeholder="Ex: Respiration profonde">
+            </div>
+
+            <div class="form-group">
+                <label for="category">Catégorie *</label>
+                <input type="text" id="category" name="category" required placeholder="Ex: Respiration, Méditation, Mouvement">
+            </div>
+
+            <div class="form-group">
+                <label for="duration">Durée (minutes) *</label>
+                <input type="number" id="duration" name="duration" required placeholder="Ex: 10" min="1">
+            </div>
+
+            <div class="form-group">
+                <label for="material">Matériel nécessaire</label>
+                <input type="text" id="material" name="material" placeholder="Ex: Tapis de yoga, coussin">
+            </div>
+
+            <div class="form-group">
+                <label for="beforeEmotion">Émotion avant</label>
+                <input type="text" id="beforeEmotion" name="beforeEmotion" placeholder="Ex: Stress, Anxiété">
+            </div>
+
+            <div class="form-group">
+                <label for="afterEmotion">Émotion après</label>
+                <input type="text" id="afterEmotion" name="afterEmotion" placeholder="Ex: Calme, Sérénité">
+            </div>
+
+            <div class="form-group">
+                <label for="recommendedFor">Recommandé pour</label>
+                <input type="text" id="recommendedFor" name="recommendedFor" placeholder="Ex: Réduction du stress">
+            </div>
+
+            <div class="form-group">
+                <label for="mediaFile">Fichier média (URL)</label>
+                <input type="text" id="mediaFile" name="mediaFile" placeholder="Ex: https://example.com/video.mp4">
+                <div class="field-hint">URL d'une image, vidéo ou audio</div>
+            </div>
+
+            <button type="submit" class="submit-btn" id="submitBtn">Créer l'exercice</button>
+        </form>
+    </div>
+
+    <script>
+        const BASE_URL = 'http://localhost/omk_thyp_25-26_clone';
+        const KEY_IDENTITY = '9x53ZNIuZMJofzCo54y7yRUVHbx1bnUw';
+        const KEY_CREDENTIAL = 'Pnf97t9lJ28ypl8DC575a0pw8ayhjPef';
+        const RESOURCE_TEMPLATE_ID = 8;
+
+        const form = document.getElementById('exerciseForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const messageDiv = document.getElementById('message');
+
+        function showMessage(text, type) {
+            messageDiv.textContent = text;
+            messageDiv.className = `message ${type} show`;
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Création en cours...';
+
+            const formData = new FormData(form);
+            
+            // Build simplified payload
+            const payload = {
+                'o:resource_template': { 'o:id': RESOURCE_TEMPLATE_ID },
+                'dcterms:title': [{ '@value': formData.get('title') }]
+            };
+
+            // Add custom properties
+            if (formData.get('category')) {
+                payload['beo:hasCategory'] = [{ '@value': formData.get('category') }];
+            }
+            if (formData.get('duration')) {
+                payload['beo:duration'] = [{ '@value': formData.get('duration') + ' minutes' }];
+            }
+            if (formData.get('material')) {
+                payload['beo:neededMaterial'] = [{ '@value': formData.get('material') }];
+            }
+            if (formData.get('beforeEmotion')) {
+                payload['beo:beforeEmotion'] = [{ '@value': formData.get('beforeEmotion') }];
+            }
+            if (formData.get('afterEmotion')) {
+                payload['beo:afterEmotion'] = [{ '@value': formData.get('afterEmotion') }];
+            }
+            if (formData.get('recommendedFor')) {
+                payload['beo:recommendedFor'] = [{ '@value': formData.get('recommendedFor') }];
+            }
+            if (formData.get('mediaFile')) {
+                payload['beo:mediaFile'] = [{ '@value': formData.get('mediaFile') }];
+            }
+
+            console.log('Payload:', JSON.stringify(payload, null, 2));
+
+            try {
+                const response = await fetch(`${BASE_URL}/api/items`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Basic ' + btoa(`${KEY_IDENTITY}:${KEY_CREDENTIAL}`)
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+                console.log('Réponse:', data);
+
+                if (response.ok) {
+                    showMessage(`✓ Exercice créé avec succès ! ID: ${data['o:id']}`, 'success');
+                    form.reset();
+                } else {
+                    console.error('Erreur:', data);
+                    showMessage(`✗ Erreur: ${data.error || JSON.stringify(data.errors)}`, 'error');
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+                showMessage(`✗ Erreur de connexion: ${error.message}`, 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Créer l\'exercice';
+            }
+        });
+    </script>
+</body>
+</html>

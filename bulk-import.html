@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Import CSV vers Omeka S</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f0e8 0%, #e8f5e9 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            max-width: 700px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #4a7c59;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+
+        .upload-area {
+            border: 3px dashed #81c784;
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 30px;
+            background: #f9fdf9;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .upload-area:hover {
+            background: #f1f8f1;
+            border-color: #66bb6a;
+        }
+
+        .upload-area.dragover {
+            background: #e8f5e9;
+            border-color: #4a7c59;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .upload-label {
+            color: #4a7c59;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .upload-hint {
+            color: #888;
+            font-size: 14px;
+        }
+
+        .import-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #66bb6a 0%, #4a7c59 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: none;
+        }
+
+        .import-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(74, 124, 89, 0.3);
+        }
+
+        .import-btn:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .import-btn.show {
+            display: block;
+        }
+
+        .progress {
+            margin: 20px 0;
+            display: none;
+        }
+
+        .progress.show {
+            display: block;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #e0e0e0;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #66bb6a 0%, #4a7c59 100%);
+            width: 0%;
+            transition: width 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .log {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f5f5f5;
+            border-radius: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            display: none;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+        }
+
+        .log.show {
+            display: block;
+        }
+
+        .log-entry {
+            padding: 5px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .log-entry:last-child {
+            border-bottom: none;
+        }
+
+        .log-entry.success {
+            color: #2e7d32;
+        }
+
+        .log-entry.error {
+            color: #c62828;
+        }
+
+        .log-entry.info {
+            color: #1565c0;
+        }
+
+        .preview {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f9fdf9;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .preview.show {
+            display: block;
+        }
+
+        .preview h3 {
+            color: #4a7c59;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .preview-info {
+            color: #666;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Import CSV → Omeka S</h1>
+        
+        <div class="upload-area" id="uploadArea">
+            <label for="csvFile" class="upload-label">📁 Sélectionner exercises.csv</label>
+            <div class="upload-hint">Ou glisser-déposer le fichier ici</div>
+            <input type="file" id="csvFile" accept=".csv">
+        </div>
+
+        <div class="preview" id="preview">
+            <h3>Aperçu du fichier:</h3>
+            <div class="preview-info" id="previewInfo"></div>
+        </div>
+
+        <button class="import-btn" id="importBtn">Importer tous les exercices</button>
+
+        <div class="progress" id="progress">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill">0%</div>
+            </div>
+        </div>
+
+        <div class="log" id="log"></div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost/omk_thyp_25-26_clone';
+        const IDENTITY = 'apDsWeLrBaARNIElOcFY5uISBlRs9Vtd';
+        const CREDENTIAL = 'ScjaQajebr7WFO2oTL7flEYdoR4Oi1vs';
+        const RESOURCE_TEMPLATE_ID = 8;
+        
+        const authString = btoa(`${IDENTITY}:${CREDENTIAL}`);
+
+        const uploadArea = document.getElementById('uploadArea');
+        const csvFileInput = document.getElementById('csvFile');
+        const importBtn = document.getElementById('importBtn');
+        const preview = document.getElementById('preview');
+        const previewInfo = document.getElementById('previewInfo');
+        const progress = document.getElementById('progress');
+        const progressFill = document.getElementById('progressFill');
+        const log = document.getElementById('log');
+
+        let exercises = [];
+
+        // Upload area click
+        uploadArea.addEventListener('click', () => {
+            csvFileInput.click();
+        });
+
+        // Drag and drop
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            if (file && file.name.endsWith('.csv')) {
+                handleFile(file);
+            }
+        });
+
+        // File input change
+        csvFileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                handleFile(file);
+            }
+        });
+
+        function handleFile(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const csv = e.target.result;
+                parseCSV(csv);
+            };
+            reader.readAsText(file, 'UTF-8');
+        }
+
+        function parseCSV(csv) {
+            // Split lines and filter empty ones
+            const lines = csv.split(/\r?\n/).filter(line => line.trim());
+            
+            if (lines.length < 2) {
+                addLog('Fichier CSV vide ou invalide', 'error');
+                log.classList.add('show');
+                return;
+            }
+            
+            // Parse header
+            const headers = lines[0].split(',').map(h => h.trim());
+            console.log('Headers:', headers);
+            
+            exercises = [];
+            
+            // Parse each data line
+            for (let i = 1; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (!line) continue;
+                
+                const values = line.split(',').map(v => v.trim());
+                
+                if (values.length >= headers.length) {
+                    const exercise = {};
+                    headers.forEach((header, index) => {
+                        exercise[header] = values[index] || '';
+                    });
+                    exercises.push(exercise);
+                    console.log(`Exercise ${i}:`, exercise);
+                }
+            }
+
+            if (exercises.length > 0) {
+                previewInfo.innerHTML = `<strong>${exercises.length} exercice(s) trouvé(s):</strong><br>` + 
+                    exercises.map(e => `• ${e.Title}`).join('<br>');
+                preview.classList.add('show');
+                importBtn.classList.add('show');
+                addLog(`✓ Fichier chargé: ${exercises.length} exercice(s) prêt(s)`, 'info');
+                log.classList.add('show');
+            } else {
+                addLog('Aucun exercice trouvé dans le fichier', 'error');
+                log.classList.add('show');
+            }
+        }
+
+        function addLog(message, type = 'info') {
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.textContent = `${new Date().toLocaleTimeString()} - ${message}`;
+            log.appendChild(entry);
+            log.scrollTop = log.scrollHeight;
+        }
+
+        async function createExercise(exercise) {
+            const payload = {
+                'o:resource_template': {
+                    'o:id': RESOURCE_TEMPLATE_ID
+                },
+                'o:resource_class': {
+                    'o:id': null
+                },
+                'dcterms:title': [
+                    {
+                        'type': 'literal',
+                        'property_id': 1,
+                        '@value': exercise.Title
+                    }
+                ]
+            };
+
+            if (exercise.Catégorie) {
+                payload['beo:hasCategory'] = [
+                    {
+                        'type': 'literal',
+                        'property_label': 'Catégorie',
+                        '@value': exercise.Catégorie
+                    }
+                ];
+            }
+
+            if (exercise.Durée) {
+                payload['beo:duration'] = [
+                    {
+                        'type': 'literal',
+                        'property_label': 'Durée',
+                        '@value': exercise.Durée + ' minutes'
+                    }
+                ];
+            }
+
+            if (exercise['Matériel nécessaire']) {
+                payload['beo:neededMaterial'] = [
+                    {
+                        'type': 'literal',
+                        'property_label': 'Matériel nécessaire',
+                        '@value': exercise['Matériel nécessaire']
+                    }
+                ];
+            }
+
+            if (exercise['Émotion avant']) {
+                payload['beo:beforeEmotion'] = [
+                    {
+                        'type': 'literal',
+                        'property_label': 'Émotion avant',
+                        '@value': exercise['Émotion avant']
+                    }
+                ];
+            }
+
+            if (exercise['Émotion après']) {
+                payload['beo:afterEmotion'] = [
+                    {
+                        'type': 'literal',
+                        'property_label': 'Émotion après',
+                        '@value': exercise['Émotion après']
+                    }
+                ];
+            }
+
+            if (exercise['Recommandé pour']) {
+                payload['beo:recommendedFor'] = [
+                    {
+                        'type': 'literal',
+                        'property_label': 'Recommandé pour',
+                        '@value': exercise['Recommandé pour']
+                    }
+                ];
+            }
+
+            if (exercise['Fichier média']) {
+                payload['beo:mediaFile'] = [
+                    {
+                        'type': 'literal',
+                        'property_label': 'Fichier média',
+                        '@value': exercise['Fichier média']
+                    }
+                ];
+            }
+
+            const response = await fetch(`${API_BASE_URL}/api/items`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Basic ${authString}`
+                },
+                body: JSON.stringify(payload)
+            });
+
+            return response;
+        }
+
+        importBtn.addEventListener('click', async () => {
+            importBtn.disabled = true;
+            importBtn.textContent = 'Import en cours...';
+            progress.classList.add('show');
+            
+            let successCount = 0;
+            let errorCount = 0;
+
+            for (let i = 0; i < exercises.length; i++) {
+                const exercise = exercises[i];
+                const percent = Math.round(((i + 1) / exercises.length) * 100);
+                progressFill.style.width = percent + '%';
+                progressFill.textContent = percent + '%';
+
+                try {
+                    const response = await createExercise(exercise);
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        successCount++;
+                        addLog(`✓ "${exercise.Title}" créé (ID: ${data['o:id']})`, 'success');
+                    } else {
+                        errorCount++;
+                        addLog(`✗ Erreur pour "${exercise.Title}": ${JSON.stringify(data.errors || 'Erreur inconnue')}`, 'error');
+                    }
+                } catch (error) {
+                    errorCount++;
+                    addLog(`✗ Erreur réseau pour "${exercise.Title}": ${error.message}`, 'error');
+                }
+
+                // Small delay between requests
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
+
+            importBtn.textContent = `✓ Import terminé (${successCount} réussi(s), ${errorCount} erreur(s))`;
+            addLog(`\n=== RÉSUMÉ: ${successCount}/${exercises.length} exercices importés avec succès ===`, successCount === exercises.length ? 'success' : 'info');
+        });
+    </script>
+</body>
+</html>
